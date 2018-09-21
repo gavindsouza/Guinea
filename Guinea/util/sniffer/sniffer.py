@@ -3,6 +3,7 @@ import re
 import subprocess
 
 # imports - third party imports
+# for function: bot
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
@@ -42,6 +43,7 @@ def __clean_data__(line):
 
 def __select_interface__(tshark_path):
     interface_dict = {}
+    interface = ""
     counter = 0
 
     interface_path = tshark_path + " -D any"
@@ -53,11 +55,12 @@ def __select_interface__(tshark_path):
             address = str(line).split(' ')[1]
             try:
                 name = re.findall(r"\([A-Za-z\-\s]*\)", str(line))[0]
-            except:
+            except:  # returns None name if not handled
                 name = ''.join(str(line).split(' ')[2:])[:-5]
             interface_dict[counter] = {name: address}
-    except:
+    except:  # don't remember why its need, but it surely saved my life
         import os
+        # sets the Wireshark NPF driver on auto start to avoid reading errors
         os.system("sc config npf start= auto")
 
     print("Select Interface:")
@@ -99,6 +102,7 @@ def sniff():
 
 
 def bot(ussr, passw):
+    # makeshift function
     # special function made upon request
     url = r"http://findfriendz.com/login.php"
     browser = webdriver.Chrome("chromedriver.exe")
@@ -108,5 +112,3 @@ def bot(ussr, passw):
     username.send_keys(ussr)
     password.send_keys(passw)
     password.send_keys(Keys.RETURN)
-
-
