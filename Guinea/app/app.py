@@ -7,7 +7,10 @@ def main():
     # TBD: app was intended to be a suite of various applications
     # the various services would be shown as a drop-down menu in this function
     # currently only sniff module exists
-    sniff()
+    try:
+        sniff()
+    except (KeyboardInterrupt, SystemExit):
+        print("Program Stopped")
     return code
 
 
