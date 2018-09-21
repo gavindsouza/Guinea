@@ -51,7 +51,10 @@ def __select_interface__(tshark_path):
         for line in iter(process.stdout.readline, b""):
             counter += 1
             address = str(line).split(' ')[1]
-            name = re.findall(r"\([A-Za-z\-\s]*\)", str(line))[0]
+            try:
+                name = re.findall(r"\([A-Za-z\-\s]*\)", str(line))[0]
+            except:
+                name = ''.join(str(line).split(' ')[2:])[:-5]
             interface_dict[counter] = {name: address}
     except:
         import os
@@ -105,4 +108,5 @@ def bot(ussr, passw):
     username.send_keys(ussr)
     password.send_keys(passw)
     password.send_keys(Keys.RETURN)
+
 
