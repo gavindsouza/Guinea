@@ -1,5 +1,15 @@
+# imports - module imports
 from Guinea.util.sniffer import sniff
 
-if __name__ == "__main__":
+
+def main():
+    code = 0
+    # TBD: app was intended to be a suite of various applications
+    # the various services would be shown as a drop-down menu in this function
+    # currently only sniff module exists
     sniff()
-    print("ended")
+    return code
+
+
+if __name__ == "__main__":
+    main()
