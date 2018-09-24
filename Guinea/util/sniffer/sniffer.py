@@ -80,7 +80,11 @@ def __select_interface__(tshark_path):
 def sniff():
     print("Using Tshark")
 
-    tshark_path = '"' + input("Enter tshark path: ") + '"'  # r"C:\Program Files\Wireshark\tshark.exe"
+    path = input("Enter tshark path: ")
+    if path[0] == '"' and path[-1] == '"':
+        tshark_path = path
+    else:
+        tshark_path = '"' + path + '"'  # r"C:\Program Files\Wireshark\tshark.exe"
 
     interface = __select_interface__(tshark_path)
     method = r" -Y http.request.method==POST "
