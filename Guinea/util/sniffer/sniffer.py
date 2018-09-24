@@ -25,11 +25,30 @@ def __clean_data__(line):
     # parser for extracting data, returns dict
     # format: {site:site-address, user:user-data, pass:pass-data}
 
+    except_count = 0  # variable count to check if exception occurs
+
     match_str = r"((user)|(email))[A-Za-z]*=[A-Za-z0-9]*(%40)?[a-zA-Z.]*&(pass)[A-Za-z]*=[A-Za-z0-9]*"
     ip_addr_str = r"\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}"
 
-    user_pass = re.search(match_str, line).group()
-    ip = re.search(ip_addr_str, line).group()
+    try:
+        user_pass = re.search(match_str, line).group()
+    except AttributeError:
+        # in case the user/pass isn't found
+        except_count += 1
+        user_pass = line
+
+    try:
+        ip = re.search(ip_addr_str, line).group()
+    except AttributeError:
+        # in case the ip isn't found
+        except_count += 1
+        ip = line
+
+    if except_count > 1:
+        # if exceptions occur, save raw data in file instead
+        return {"site": line, "user": "", "pass": ""}
+
+    # if everything goes as smooth as planned...
     user, passw = user_pass.split('&')
 
     user = ''.join(user.split('=')[1:])
