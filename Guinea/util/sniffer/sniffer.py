@@ -15,7 +15,10 @@ def __get_data__(cmd):
         if "Capturing" in str(line):
             return
         elif line not in [None, '', ' ']:
-            return __clean_data__(str(line))
+            if str(line).strip()[0] is '{':
+                return
+            else:
+                return __clean_data__(str(line))
         else:
             return
 
@@ -25,6 +28,8 @@ def __clean_data__(line):
     # parser for extracting data, returns dict
     # format: {site:site-address, user:user-data, pass:pass-data}
 
+    # initializing variables
+    user, passw = '', ''  # if dont exist
     except_count = 0  # variable count to check if exception occurs
 
     match_str = r"((user)|(email))[A-Za-z]*=[A-Za-z0-9]*(%40)?[a-zA-Z.]*&(pass)[A-Za-z]*=[A-Za-z0-9]*"
@@ -44,12 +49,15 @@ def __clean_data__(line):
         except_count += 1
         ip = line
 
+    # if everything goes as smooth as planned...
+    try:
+        user, passw = user_pass.split('&')
+    except ValueError:
+        print(user_pass)
+
     if except_count > 1:
         # if exceptions occur, save raw data in file instead
         return {"site": line, "user": "", "pass": ""}
-
-    # if everything goes as smooth as planned...
-    user, passw = user_pass.split('&')
 
     user = ''.join(user.split('=')[1:])
     passw = ''.join(passw.split('=')[1:])  # might have = in pass
